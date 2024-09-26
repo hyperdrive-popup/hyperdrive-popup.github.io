@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+    <script>
+		window.addEventListener('message', function(event) {
+			console.log('Received message:', JSON.stringify(event));
+			if (event.source?.postMessage) {
+				event.source.postMessage('pong', '*');
+			}
+		});
+
+		// try to open w/o target
+		var popup = window.open('', '__as_popup', 'width=600,height=400');
+		if (!popup || popup.closed) {
+			popup = window.open('popup.html', '__as_popup', 'width=600,height=400');
+			if (!popup) {
+				alert('Please enable popups for this site');
+
+				console.log('No popup, trying to find it again');
+				// HACK: try to find our popup again
+				var searchTimer = setInterval(function() {
+					var result = window.open('', '__as_popup');
+					if (!result) {
+						return;
+					}
+					popup = result;
+					clearInterval(searchTimer);
+					console.log('Found popup!');
+				}, 100);
+			}
+		} else {
+			alert('You have a sane browser!');
+		}
+		var closeTimer = setInterval(function() {
+			if (!popup) {
+				return;
+			}
+			if (!popup.closed) {
+				popup.postMessage('ping', '*');
+				return;
+			}
+			console.log('Popup closed');
+			clearInterval(closeTimer);
+		}, 100);
+    </script>
+</body>
+</html>

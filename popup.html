@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Popup</title>
+</head>
+<body>
+    <script>
+        function unloadHandler(e) {
+            window.stop();
+            if (window.opener) {
+                window.opener.postMessage("unload", "*");
+            }
+            var message = "Please don't close me lol";
+            e = e || window.event;
+            e.preventDefault(); // required in some browsers
+            e.returnValue = message; // required in some browsers
+            alert(message);
+            return message; // only works in old browsers
+        }
+
+        if (window.addEventListener) {
+            window.addEventListener("load", loadHandler, true);
+            window.addEventListener("unload", unloadHandler, true);
+        } else if (window.attachEvent) {
+            window.attachEvent("onload", loadHandler);
+            window.attachEvent("onunload", unloadHandler);
+        } else {
+			window.onload = loadHandler;
+			window.onunload = unloadHandler;
+		}
+    </script>
+    <script src="/static/js/popup.bundle.js"></script>
+</body>
+</html>
