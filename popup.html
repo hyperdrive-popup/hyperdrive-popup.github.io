@@ -6,17 +6,21 @@
 </head>
 <body>
     <script>
-        function unloadHandler(e) {
-            window.stop();
+        function loadHandler() {
+            if (window.opener) {
+                window.opener.postMessage("load", "*");
+            } else {
+                console.error("load: no opener");
+            }
+            console.log("load");
+        }
+        function unloadHandler() {
             if (window.opener) {
                 window.opener.postMessage("unload", "*");
+            } else {
+                console.error("load: no opener");
             }
-            var message = "Please don't close me lol";
-            e = e || window.event;
-            e.preventDefault(); // required in some browsers
-            e.returnValue = message; // required in some browsers
-            alert(message);
-            return message; // only works in old browsers
+            console.log("unload");
         }
 
         if (window.addEventListener) {
@@ -26,10 +30,16 @@
             window.attachEvent("onload", loadHandler);
             window.attachEvent("onunload", unloadHandler);
         } else {
-			window.onload = loadHandler;
-			window.onunload = unloadHandler;
-		}
+            window.onload = loadHandler;
+            window.onunload = unloadHandler;
+        }
+
+        window.addEventListener('message', function(event) {
+            console.log('Received message:', JSON.stringify(event));
+            if (event.source?.postMessage) {
+                event.source.postMessage('ping', '*');
+            }
+        });
     </script>
-    <script src="/static/js/popup.bundle.js"></script>
 </body>
 </html>
